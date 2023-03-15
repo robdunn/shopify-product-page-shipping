@@ -1,23 +1,25 @@
 # Product Page Shipping for Shopify
 
-This is the open source versiom of our MT Product Page Shipping app for Shopify. Once set up, the app will display a shipping widget on your product pages.
+This is the open source versiom of MT Product Page Shipping app for Shopify. Once set up, the app will display a shipping widget on your product pages.
 
 ## Install and setup
 
 1. Set up a Google Cloud project and enable Maps Javascript API by following these instructions:
 https://developers.google.com/maps/documentation/javascript/cloud-setup
 
-2. Upload the shopify-product-page-shipping Assets and Snippits to your Shopify theme's folders:
+2. In your Google Cloud project enable "Geocoding API" and "Geolocation API".
 
-```theme root
-      Snippits
-        product-shipping.liquid
-      Assets
-        rates.css
-        rates.js
-```
+3. In Shopify Admin, navigate to "Online Store" -> "Themes" and "Edit Code" of the theme you'd like to add the widget to.
 
-3. Open product-shipping.liquid and update GOOGLE_MAPS_API_KEY with your Google Maps API key created in step 1.
+4. In the code editor, upload the rates.css and rates.js to your theme's Assets folder.
+
+5. Add a new snippit to your themes "Snippits" folder called 'product-shipping.liquid' and paste the contents of product-shipping.liquid into the new file.
+
+6. In product-shipping.liquid update GOOGLE_MAPS_API_KEY with your Google Maps API key created in step 1.
+
+7. Open your product template and paste this code in the location where you'd like to display the widget:
+
+`{% include 'product-shipping', variant: variant, product: product, shop: shop %}`
 
 ## Options set up in product-shipping.liquid
 

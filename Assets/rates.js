@@ -104,10 +104,6 @@ function loadjQueryUI(callback) {
   
       let google_key = shopData.key;
   
-      let env = getEnv();
-      let postal_url = env === "dev" ? "d1dyiy97nu2hn0" : "d30atl23nfmzan";
-      let address_endpoint = env === "dev" ? "d1zmlhrajozf7s" : "d2thwlunl8wwd4";
-  
       await $.post(
         "https://www.googleapis.com/geolocation/v1/geolocate?key=" + google_key,
         "json"
@@ -180,7 +176,6 @@ function loadjQueryUI(callback) {
         }
   
         //check tags
-        console.log('shopData',shopData)
         if (shopData.tags && shopData.tags.length) {
           shopData.producttags = shopData.producttags.split(',');
           let tag_check = shopData.producttags.filter((tag) =>
@@ -216,7 +211,7 @@ function loadjQueryUI(callback) {
       let select = false;
   
       const autocompleteService = new google.maps.places.AutocompleteService();
-      const placesService =       new google.maps.places.PlacesService($('#postalcode').get(0));
+      const placesService = new google.maps.places.PlacesService($('#postalcode').get(0));
       const myLatLng = new google.maps.LatLng(parseFloat(location.lat), parseFloat(location.lng));
   
       $("#postalcode")
@@ -343,11 +338,6 @@ function loadjQueryUI(callback) {
                     }
                   });
                 });
-                
-              // let url = 'https://maps.googleapis.com/maps/api/place/';        
-              // const place_id = ui.item.value;
-              // url += 'details/json?key=' + google_key + '&fields=formatted_address,geometry,address_component&place_id='+ place_id + '&sessiontoken=' + sessiontoken;
-                // $.get(url).done(function (place_data) {
                   //place call, reset session
                   sessiontoken = crypto.randomUUID();
                   console.log('detailsRequest', detailsRequest);
@@ -364,7 +354,6 @@ function loadjQueryUI(callback) {
                       postal_code: placeAddress.code,
                       country_code: placeAddress.country_code,
                     });
-                // });
               }
             }
             return false;
@@ -499,8 +488,8 @@ function loadjQueryUI(callback) {
                   let params = new URL(document.location).searchParams;
                   let url_variant = params.get("variant");
                   if (url_variant) {
-                    let variantData = shopData.products.productByHandle.variants.edges.find(
-                      (edge) => edge.node.id.indexOf(url_variant) > -1
+                    let variantData = shopData.variants.split(',').find(
+                      (variant) => variant.indexOf(url_variant) > -1
                     );
                     $selected = $("<option>").data(variantData.node);
                   } else {
@@ -511,14 +500,14 @@ function loadjQueryUI(callback) {
                       .css({ display: "none" })
                       .append(variant_html);
                     $selected = $variants_div.find("option:selected");
-                    let variantData = shopData.products.productByHandle.variants.edges.find(
-                      (edge) => edge.node.id.indexOf($selected.val()) > -1
+                    let variantData = shopData.variants.split(',').find(
+                      (variant) => variant.indexOf($selected.val()) > -1
                     );
                     $selected = $("<option>").data(variantData.node);
                   }
                 } else
                   $selected = $("<option>").data(
-                    shopData.products.productByHandle.variants.edges[0].node
+                    shopData.variants.split(',')[0]
                   );
   
                 setQuantity();
@@ -544,8 +533,8 @@ function loadjQueryUI(callback) {
           let params = new URL(document.location).searchParams;
           let url_variant = params.get("variant");
           if (url_variant) {
-            let variantData = shopData.products.productByHandle.variants.edges.find(
-              (edge) => edge.node.id.indexOf(url_variant) > -1
+            let variantData = shopData.variants.split(',').find(
+              (variant) => variant.indexOf(url_variant) > -1
             );
             $selected = $("<option>").data(variantData.node);
           } else {
@@ -556,14 +545,14 @@ function loadjQueryUI(callback) {
               .css({ display: "none" })
               .append(variant_html);
             $selected = $variants_div.find("option:selected");
-            let variantData = shopData.products.productByHandle.variants.edges.find(
-              (edge) => edge.node.id.indexOf($selected.val()) > -1
+            let variantData = shopData.variants.split(',').find(
+              (variant) => variant.indexOf($selected.val()) > -1
             );
             $selected = $("<option>").data(variantData.node);
           }
         } else
           $selected = $("<option>").data(
-            shopData.products.productByHandle.variants.edges[0].node
+            shopData.variants.split(',')[0]
           );
   
         setQuantity();
@@ -580,25 +569,6 @@ function loadjQueryUI(callback) {
         }
       };
   
-      const prepCheckout = () => {
-        let variantId = $sr_variants.find("option:selected").data("id");
-        if (!variantId) variantId = firstId;
-        variantId = variantId.substring(variantId.lastIndexOf("/") + 1);
-        let checkoutUrl =
-          "https://" + Shopify.shop + "/cart/" + variantId + ":" + quantity;
-        checkoutUrl +=
-          "?checkout[shipping_address][address1]=" +
-          $("#postalcode").data("address1") +
-          "&checkout[shipping_address][city]=" +
-          $("#postalcode").data("city") +
-          "&checkout[shipping_address][country]=" +
-          $("#postalcode").data("country_code") +
-          "&checkout[shipping_address][zip]=" +
-          $("#postalcode").data("postal_code");
-        console.log("checkout", checkoutUrl);
-        //window.location.href = checkoutUrl;
-      };
-  
       const drawResults = (results) => {
         $("#rates_loading").hide();
         $(".rate_results").show();
@@ -611,7 +581,6 @@ function loadjQueryUI(callback) {
           let $result_box = $(".result_box").show().html("");
           results.map((rate) => {
             let $result = $("<div></div>")
-              //.bind('click', prepCheckout)
               .addClass("inner")
               .css({})
               .appendTo($result_box);
@@ -1022,20 +991,6 @@ function loadjQueryUI(callback) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
-  };
-  
-  const getEnv = () => {
-    var scripts = document.getElementsByTagName("script");
-    let rates_script;
-    for (var i = 0; i < scripts.length; i++) {
-      if (scripts[i].src.indexOf("rates.js") > -1) rates_script = scripts[i];
-    }
-    if (
-      rates_script &&
-      rates_script.src.indexOf("632023b7-62c9-4d05-825f-14e704b03f1f") > -1
-    )
-      return "dev";
-    else return "prod";
   };
   
   const ratesCountryCodes = [
