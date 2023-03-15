@@ -1,0 +1,45 @@
+<div class="shipping_rates compact" style="display:none">
+    <div>
+      <label class="form__label" for="postalcode">{{ block.settings.label }}</label>
+      <div class="field">
+        <input type="text" autocomplete="off" name="postalcode" 
+            data-key="GOOGLE_MAPS_API_KEY"
+            {% # enter you google maps js api key here %}
+            data-auto="true"
+            {% # Automaticly search rates based on customer location %}
+            data-free="Free" 
+            data-tags="asics-tiger,autumn"
+            data-contains="true"
+            data-search="postal_code" 
+            {% # data-search values: address | postal_code | locality%7Cpostal_code | country %}
+            data-delivery_singular="business day" 
+            data-delivery_plural="business days"
+            data-countries="true"
+            {% # restrict search to counties listed in data-countryCodes %}
+            data-countryCodes="US,CA,JP,AU"
+            {% # comma seperated list of coutries you ship to, limit 5 %}
+            data-variant="{{ variant.id }}"
+            data-variants="{% for variant in product.variants %}{{ variant.id }},{% endfor %}"
+            data-producttags="{% for tag in product.tags %}{{ tag }},{% endfor %}"
+            id="postalcode" class="form__input field__input form-field-input" placeholder="Shipping address" />
+        <input type="hidden" id="postalcode-id" />
+      </div>
+      <button class="btn button button--full-width button-secondary" style="background-color:#000000;color:#ffffff;">Get shipping rates</button>
+      <div class="rates_error">Please enter a shipping address.</div>
+      <div class="rates_select">Please select a shipping address.</div>
+      <div class="rates_cart_error"></div>
+      <div class="rates_loading" id="rates_loading">
+        <div class="rates_spinner">
+          <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+        </div>
+        <h3 id="shipping-rates__loading">Getting available shipping rates...</h3>
+      </div>
+      <div class="rate_results" id="rates_results">
+        <div class="rate_noresult">No rates found</div>
+        <div class="result_box"></div>
+        <div class="result_note">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+  
+  

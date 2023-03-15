@@ -1,0 +1,114 @@
+.rates-autocomplete {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: default;
+  }
+  .ui-widget .ui-menu-item {
+    font-family: var(--font-body-family);
+  }
+  .ui-widget.ui-widget-content {
+    z-index: 10000 !important;
+  }
+  .spinner {
+    animation: rotate 2s linear infinite;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+  }
+  .path {
+    stroke: black;
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+  }
+  .shipping_rates {
+    display: none;
+  }
+  .shipping_rates .field {
+    margin-bottom: 1rem;
+  }
+  .shipping_rates .rates_spinner {
+    text-align: center;
+  }
+  .shipping_rates .rates_cart_error,
+  .shipping_rates .rates_error,
+  .shipping_rates .rates_select,
+  .shipping_rates .rates_loading,
+  .shipping_rates .rates_results,
+  .shipping_rates .rate_noresult,
+  .shipping_rates .result_box,
+  .shipping_rates .result_note {
+    display: none;
+    clear: both;
+  }
+  .shipping_rates .rates_loading {
+    padding: 15px 0;
+  }
+  .shipping_rates .result_box {
+    border: 1px solid #d9d9d9;
+  }
+  .shipping_rates .rate_results {
+    margin: 10px 0;
+  }
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes dash {
+    0% {
+      stroke-dasharray: 1, 150;
+      stroke-dashoffset: 0;
+    }
+    50% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -35;
+    }
+    100% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -124;
+    }
+  }
+  .ui-autocomplete {
+    position: absolute;
+    cursor: default;
+    z-index: 30 !important;
+  }
+  .shipping_rates.compact .field {
+    float: left;
+    max-width: 50%;
+  }
+  .shipping_rates.compact button {
+    float: left;
+    max-width: 50%;
+    font-size: 0.8em;
+  }
+  .shipping_rates.compact .rates_error,
+  .shipping_rates.compact .rates_select,
+  .shipping_rates.compact .rates_loading,
+  .shipping_rates.compact .rate_results {
+    clear: both;
+  }
+  .shipping_rates .field__input:not(:placeholder-shown) {
+    padding: 1.2rem 1.5rem 0.8rem 2rem;
+  }
+  .shipping_rates .result_box .inner {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  .shipping_rates .result_box .inner:last-child {
+    border-bottom: 0px;
+  }
+  .shipping_rates .result_box .row {
+    flex: 1 1 0px;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .shipping_rates .result_box .price {
+    flex: 0 1 1px;
+    white-space: nowrap;
+  }
+  
