@@ -22,7 +22,7 @@ https://developers.google.com/maps/documentation/javascript/cloud-setup
 ## Options set up in product-shipping.liquid
 
 | Option | Type | Example | Description |
-| --- | ----- | ----------- |  ----------- | 
+| ----- | --- | ------- |  ----------- | 
 | data-key | `string` | `XXXXXXXXXXXXXXX` | Google Maps API key  |
 | data-auto | `true` \| `false` | `true` | Automaticly show rates based on customer location |
 | data-free | `string` | `Free` | Text returned when shipping is free / zero |
