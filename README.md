@@ -7,7 +7,7 @@ This is the open source versiom of MT Product Page Shipping app for Shopify. Onc
 1. Set up a Google Cloud project and enable Maps Javascript API by following these instructions:
 https://developers.google.com/maps/documentation/javascript/cloud-setup
 
-2. In your Google Cloud project enable "Geocoding API" and "Geolocation API".
+2. In your Google Cloud project enable "Places API", "Geocoding API" and "Geolocation API".
 
 3. In Shopify Admin, navigate to "Online Store" -> "Themes" and "Edit Code" of the theme you'd like to add the widget to.
 
