@@ -3,20 +3,20 @@
       <label class="form__label" for="postalcode">{{ block.settings.label }}</label>
       <div class="field">
         <input type="text" autocomplete="off" name="postalcode" 
-            data-key="GOOGLE_MAPS_API_KEY"
+            data-key="AIzaSyBJtRzga1GJSolh3layIX_QgJo4ZstvguU"
             {% # enter you google maps js api key here %}
             data-auto="true"
             {% # Automaticly search rates based on customer location %}
             data-free="Free" 
             data-tags="asics-tiger,autumn"
             data-contains="true"
-            data-search="postal_code" 
-            {% # data-search values: address | postal_code | locality%7Cpostal_code | country %}
+            data-types="locality,postal_code" 
+            {% # comma seperated list of search types values: address | postal_code | locality | country %}
             data-delivery_singular="business day" 
             data-delivery_plural="business days"
             data-countries="true"
             {% # restrict search to counties listed in data-countryCodes %}
-            data-countryCodes="US,CA,JP,AU"
+            data-country_codes="au,jp"
             {% # comma seperated list of coutries you ship to, limit 5 %}
             data-variant="{{ variant.id }}"
             data-variants="{% for variant in product.variants %}{{ variant.id }},{% endfor %}"
@@ -41,5 +41,5 @@
       </div>
     </div>
   </div>
-  
-  
+  {{ 'rates.js' | asset_url | script_tag }}
+  {{ 'rates.css' | asset_url | stylesheet_tag }}

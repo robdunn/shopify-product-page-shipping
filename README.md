@@ -30,7 +30,7 @@ https://developers.google.com/maps/documentation/javascript/cloud-setup
 | data-free | `string` | `Free` | Text returned when shipping is free / zero |
 | data-tags | `string` | `shoes,shirts,sale` | Comma separated list of product tags for showing or hiding the widget |
 | data-contains | `true` \| `false` | `true` | Show with or without the above tags. |
-| data-search | `address` \| `postal_code` \| `locality%7Cpostal_code` \| `country` | `postal_code` |  Show with or without the above tags |
+| data-types | `address` \| `postal_code` \| `locality%7Cpostal_code` \| `country` | `postal_code` |  Comma separated list of seach types to return |
 | data-delivery_singular | `string` | `business day` |  Text returned for singluar delivery days |
 | data-delivery_plural | `string` | `business days` |   Text returned for plural delivery days |
 | data-countries | `true` \| `false`  | `true` | Restrict address search to listed countries |

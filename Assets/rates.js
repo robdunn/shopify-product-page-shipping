@@ -233,7 +233,7 @@ function loadjQueryUI(callback) {
           source: async function (request, response) {
             selected = false;
             if ($("#postalcode").data("search") === "country") {
-              let results = shopData.countryCodes.split(',').map(
+              let results = shopData.country_codes.split(',').map(
                 (countryCode) => {
                   let codeName = ratesCountryCodes.find(
                     (ccode) => ccode.code === countryCode
@@ -252,21 +252,18 @@ function loadjQueryUI(callback) {
             } else {
                 let searchParams = { 
                     input: request.term,
-                    types: [shopData.search],
+                    types: shopData.types.split(','),
                     location: myLatLng,
                     radius: 5000,
                     sessiontoken: sessiontoken 
                 };
-                if (shopData.countries === "true") {
-                  codes = shopData.countryCodes.split(',').map(
-                    (code) => "country:" + code
-                  );
-                  searchParams.components = codes.join("-");
+                if (shopData.countries === true) {
+                  searchParams.componentRestrictions = {country: shopData.country_codes.split(',')};
                 }
                 console.log('searchParams',searchParams)
             
                 var predictionsRequest = await new Promise((res, rej) => {
-                  autocompleteService.getQueryPredictions(searchParams, res);
+                  autocompleteService.getPlacePredictions(searchParams, res);
                 });
   
               console.log(predictionsRequest);
@@ -441,7 +438,7 @@ function loadjQueryUI(callback) {
             sessiontoken;
   
           if (shopData.countries === "true") {
-            let codes = shopData.countryCodes.split(',').map(
+            let codes = shopData.country_codes.split(',').map(
               (code) => "country:" + code
             );
             search_url += "&components=" + codes.join("-");
