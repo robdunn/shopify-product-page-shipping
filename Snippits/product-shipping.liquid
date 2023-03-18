@@ -1,27 +1,27 @@
 <div class="shipping_rates compact" style="display:none">
-    <div>
-      <label class="form__label" for="postalcode">{{ block.settings.label }}</label>
+    <div id="rate_search">
+      <label class="form__label" for="postalcode">Shipping Estimate</label>
       <div class="field">
         <input type="text" autocomplete="off" name="postalcode" 
             data-key="GOOGLE_API_KEY"
             {% # enter you google maps js api key here %}
-            data-auto="true"
+            data-auto="false"
             {% # Automaticly search rates based on customer location %}
             data-free="Free" 
-            data-tags="asics-tiger,autumn"
+            data-tags="BS"
             data-contains="true"
-            data-types="locality,postal_code" 
+            data-types="postal_code" 
             {% # comma seperated list of search types values: address | postal_code | locality | country %}
             data-delivery_singular="business day" 
             data-delivery_plural="business days"
             data-countries="true"
             {% # restrict search to counties listed in data-countryCodes %}
-            data-country_codes="au,jp"
+            data-country_codes="au"
             {% # comma seperated list of coutries you ship to, limit 5 %}
             data-variant="{{ variant.id }}"
             data-variants="{% for variant in product.variants %}{{ variant.id }},{% endfor %}"
             data-producttags="{% for tag in product.tags %}{{ tag }},{% endfor %}"
-            id="postalcode" class="form__input field__input form-field-input" placeholder="Shipping address" />
+            id="postalcode" class="form__input field__input form-field-input" placeholder="Enter your postal code" />
         <input type="hidden" id="postalcode-id" />
       </div>
       <button class="btn button button--full-width button-secondary" style="background-color:#000000;color:#ffffff;">Get shipping rates</button>
@@ -41,5 +41,5 @@
       </div>
     </div>
   </div>
-  {{ 'rates.js' | asset_url | script_tag }}
+  <script src="{{ 'rates.js' | asset_url }}" async></script>
   {{ 'rates.css' | asset_url | stylesheet_tag }}

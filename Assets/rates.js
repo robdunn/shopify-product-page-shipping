@@ -108,20 +108,16 @@ function loadjQueryUI(callback) {
         "https://www.googleapis.com/geolocation/v1/geolocate?key=" + google_key,
         "json"
       ).done(function (ipdata) {
-        console.log(ipdata);
         cords = ipdata.location.lat + "," + ipdata.location.lng;
         location = ipdata.location;
         let geo_url = `https://maps.googleapis.com/maps/api/geocode/json?key=${google_key}&latlng=${cords}&sensor=false`;
-                  console.log('geo_url', geo_url);
         $.post( geo_url, "json" ).done(function ( geodata ) {
-          console.log(geodata);
           address = {
             city: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "locality").long_name,
             region: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "administrative_area_level_1").short_name,
             postal: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "postal_code").long_name,
             country: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "country").short_name,
           };
-          console.log('address', address);
         });
         cords = ipdata.location.lat + "," + ipdata.location.lng;
       });
@@ -136,7 +132,6 @@ function loadjQueryUI(callback) {
   
         if (auto === true) {
           if (shopData.search === "country") {
-            console.log('country')
             setTimeout(function () {
               let codeName = ratesCountryCodes.find(
                 (ccode) => ccode.code === address.country
@@ -177,7 +172,7 @@ function loadjQueryUI(callback) {
   
         //check tags
         if (shopData.tags && shopData.tags.length) {
-          shopData.producttags = shopData.producttags.split(',');
+          shopData.producttags = shopData.producttags.split(',').filter(tag => tag.length > 0);
           let tag_check = shopData.producttags.filter((tag) =>
             shopData.tags.includes(tag)
           );
@@ -190,7 +185,6 @@ function loadjQueryUI(callback) {
           $(".shipping_rates").show();
         }
         let variants = shopData.variants.split(",");
-        console.log('variants', variants);
         firstId = variants[0];
         $sr_variants = $('select[name="id"]');
         if ($sr_variants.length) {
@@ -260,15 +254,11 @@ function loadjQueryUI(callback) {
                 if (shopData.countries === true) {
                   searchParams.componentRestrictions = {country: shopData.country_codes.split(',')};
                 }
-                console.log('searchParams',searchParams)
             
                 var predictionsRequest = await new Promise((res, rej) => {
                   autocompleteService.getPlacePredictions(searchParams, res);
                 });
-  
-              console.log(predictionsRequest);
                 
-              
                 let results = predictionsRequest.filter(
                     (prediction) => prediction.types[0] !== "postal_code_prefix"
                   )
@@ -299,7 +289,6 @@ function loadjQueryUI(callback) {
           },
           select: async function (event, ui) {
             select, (selected = true);
-            console.log(ui.item)
             $("#postalcode").val(ui.item.description).data(ui.item).blur();
             $("#postalcode-id").val(ui.item.value);
   
@@ -327,7 +316,6 @@ function loadjQueryUI(callback) {
                     fields: ['formatted_address','geometry','address_component'],
                     sessiontoken: sessiontoken
                   };
-                console.log(detailsParams);
                 var detailsRequest = await new Promise((res, rej) => {
                   placesService.getDetails(detailsParams, function(results, status) {
                     if (status === google.maps.places.PlacesServiceStatus.OK) {
@@ -337,11 +325,7 @@ function loadjQueryUI(callback) {
                 });
                   //place call, reset session
                   sessiontoken = crypto.randomUUID();
-                  console.log('detailsRequest', detailsRequest);
-  
                   let placeAddress = getAddress(detailsRequest);
-  
-  
                   $("#postalcode")
                     .val(detailsRequest.formatted_address)
                     .data({
@@ -651,6 +635,7 @@ function loadjQueryUI(callback) {
   
           if ($selected.length) {
             variantId = $selected.data("id");
+            if (!variantId) variantId = $selected.val();
             if (!variantId) variantId = firstId;
           } else {
             variantId = $sr_variants.find("option:selected").data("id");
