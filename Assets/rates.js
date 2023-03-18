@@ -98,9 +98,6 @@ function loadjQueryUI(callback) {
         selected = false;
       let powered = true;
       let sessiontoken = crypto.randomUUID();
-      let endpoint =
-        "https://2n2j0bo7zi.execute-api.us-west-2.amazonaws.com/Prod/address/?shop=" +
-        Shopify.shop;
   
       let google_key = shopData.key;
   
@@ -296,7 +293,7 @@ function loadjQueryUI(callback) {
               $(".rates_noresult").html("");
   
               $("#postalcode").val(ui.item.label);
-              getCountry(ui.item.description, endpoint);
+              getCountry(ui.item.description);
   
               setTimeout(function () {
                 $(".shipping_rates button").click();
@@ -401,7 +398,7 @@ function loadjQueryUI(callback) {
         }
       });
   
-      $(".shipping_rates button").bind("click", function (event) {
+      $(".shipping_rates button").bind("click", async function (event) {
         event.preventDefault();
         $(
           "#rates_error, #rates_results, .rates_noresult, .rates_error, .rates_select, .result_box, .rates_cart_error, .result_note"
@@ -412,25 +409,23 @@ function loadjQueryUI(callback) {
           return false;
         }
         if (selected === false) {
-          let search_url =
-            endpoint +
-            "&address=" +
-            $("#postalcode").val() +
-            "&type=" +
-            $("#postalcode").data("search") +
-            "&sessiontoken=" +
-            sessiontoken;
-  
-          if (shopData.countries === "true") {
-            let codes = shopData.country_codes.split(',').map(
-              (code) => "country:" + code
-            );
-            search_url += "&components=" + codes.join("-");
-          }
-  
-          if (typeof cords === "string") search_url += "&location=" + cords;
-          $.get(search_url).done(function (address_data) {
-            let results = address_data.data.predictions.filter(
+
+          let searchParams = { 
+                    input: $("#postalcode").val(),
+                    types: shopData.types.split(','),
+                    location: myLatLng,
+                    radius: 5000,
+                    sessiontoken: sessiontoken 
+                };
+                if (shopData.countries === true) {
+                  searchParams.componentRestrictions = {country: shopData.country_codes.split(',')};
+                }
+            
+                var predictionsRequest = await new Promise((res, rej) => {
+                  autocompleteService.getPlacePredictions(searchParams, res);
+                });
+          
+            let results = predictionsRequest.filter(
               (prediction) => prediction.types[0] !== "postal_code_prefix"
             );
   
@@ -438,27 +433,31 @@ function loadjQueryUI(callback) {
               $(".shipping_rates .rates_select").show();
               return false;
             } else {
-              $.get(
-                endpoint +
-                  "&place_id=" +
-                  results[0].place_id +
-                  "&sessiontoken=" +
-                  sessiontoken
-              ).done(function (place_data) {
+              let detailsParams = {
+                    placeId: results[0].place_id, 
+                    fields: ['formatted_address','geometry','address_component'],
+                    sessiontoken: sessiontoken
+                  };
+                var detailsRequest = await new Promise((res, rej) => {
+                  placesService.getDetails(detailsParams, function(results, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                      res(results)
+                    }
+                  });
+                });
                 //place call, reset session
                 sessiontoken = crypto.randomUUID();
-  
-                let placeAddress = getAddress(place_data);
-  
-                $("#postalcode")
-                  .val(place_data.data.result.formatted_address)
-                  .data({
-                    address1: placeAddress.address1,
-                    city: placeAddress.city,
-                    province: placeAddress.province,
-                    postal_code: placeAddress.code,
-                    country_code: placeAddress.country_code,
-                  });
+
+              let placeAddress = getAddress(detailsRequest);
+                  $("#postalcode")
+                    .val(detailsRequest.formatted_address)
+                    .data({
+                      address1: placeAddress.address1,
+                      city: placeAddress.city,
+                      province: placeAddress.province,
+                      postal_code: placeAddress.code,
+                      country_code: placeAddress.country_code,
+                    });
   
                 $(".rates_loading").show();
   
@@ -494,9 +493,7 @@ function loadjQueryUI(callback) {
                 setQuantity();
   
                   getShippingQuoteCart(0);
-              });
             }
-          });
           return false;
         }
   
@@ -802,68 +799,23 @@ function loadjQueryUI(callback) {
     })(jQuery);
   }
   
-  function getCountry(country, endpoint) {
+  function getCountry(country) {
     //place call, reset session
     let sessiontoken = crypto.randomUUID();
     let countryAddress = ratesCountryCodes.find(
       (countryCode) => countryCode.name === country
     );
-    if (countryAddress.address1) {
-      $("#postalcode")
-        .data({
-          address1: countryAddress.address1,
-          city: countryAddress.city,
-          province: countryAddress.province,
-          postal_code: countryAddress.zip,
-          country_code: countryAddress.code,
-          country_name: countryAddress.name,
-          province_code: countryAddress.province_code,
-        })
-        .val(country);
-    } else {
-      let search_url =
-        endpoint +
-        "&address=" +
-        country +
-        "&type=country" +
-        "&sessiontoken=" +
-        sessiontoken;
-      $.get(search_url).done(function (address_data) {
-        $.get(
-          endpoint +
-            "&place_id=" +
-            address_data.data.predictions[0].place_id +
-            "&sessiontoken=" +
-            sessiontoken
-        ).done(function (place_data) {
-          sessiontoken = crypto.randomUUID();
-          $.get(
-            endpoint +
-              "&nearby=" +
-              place_data.data.result.geometry.location.lat +
-              "," +
-              place_data.data.result.geometry.location.lng
-          ).done(function (nearby_data) {
-            //let nearby_place = nearby_data.data.results.find(result => result.business_status === "OPERATIONAL");
-            let nearby_place = nearby_data.data.results[0];
-            $.get(endpoint + "&place_id=" + nearby_place.place_id).done(function (
-              nearby_place_detail
-            ) {
-              let nearbyPlaceAddress = getAddress(nearby_place_detail);
-              $("#postalcode")
-                .data({
-                  address1: nearbyPlaceAddress.address1,
-                  city: nearbyPlaceAddress.city,
-                  province: nearbyPlaceAddress.province,
-                  postal_code: nearbyPlaceAddress.code.split(" ").join(""),
-                  country_code: nearbyPlaceAddress.country_code,
-                })
-                .val(country);
-            });
-          });
-        });
-      });
-    }
+    $("#postalcode")
+    .data({
+        address1: countryAddress.address1,
+        city: countryAddress.city,
+        province: countryAddress.province,
+        postal_code: countryAddress.zip,
+        country_code: countryAddress.code,
+        country_name: countryAddress.name,
+        province_code: countryAddress.province_code,
+    })
+    .val(country);
   }
   
   function getAddress(place_data) {
