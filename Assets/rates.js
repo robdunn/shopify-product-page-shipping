@@ -169,7 +169,7 @@ function loadjQueryUI(callback) {
   
         //check tags
         if (shopData.tags && shopData.tags.length) {
-          shopData.producttags = shopData.producttags.split(',').filter(tag => tag.length > 0);
+          if(typeof shopData.producttags === 'string') shopData.producttags = shopData.producttags.split(',').filter(tag => tag.length > 0);
           let tag_check = shopData.producttags.filter((tag) =>
             shopData.tags.includes(tag)
           );
@@ -485,10 +485,12 @@ function loadjQueryUI(callback) {
                     );
                     $selected = $("<option>").data(variantData.node);
                   }
-                } else
+                } else {
                   $selected = $("<option>").data(
                     shopData.variants.split(',')[0]
                   );
+                }
+                  
   
                 setQuantity();
   
@@ -630,7 +632,7 @@ function loadjQueryUI(callback) {
         }).done(function (clear_data) {
           let variantId;
   
-          if ($selected.length) {
+          if ($selected && $selected.length) {
             variantId = $selected.data("id");
             if (!variantId) variantId = $selected.val();
             if (!variantId) variantId = firstId;
