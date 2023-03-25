@@ -21,6 +21,10 @@ https://developers.google.com/maps/documentation/javascript/cloud-setup
 
 `{% include 'product-shipping', variant: variant, product: product, shop: shop %}`
 
+For the Dawn theme, to have the widget show up below the price, you would want to paste the code into Sections -> main-product.liquid at about line 223, just above the: 
+
+`{% include 'product-shipping', variant: variant, product: product, shop: shop %}`
+
 ## Options set up in product-shipping.liquid
 
 | Option | Type | Example | Description |
