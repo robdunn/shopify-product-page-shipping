@@ -72,24 +72,6 @@ function loadjQueryUI(callback) {
   
   async function shipQuote() {
     (async function ($) {
-      if (typeof gapi === "undefined") {
-        // Load the script
-        const script = document.createElement("script");
-        script.src =
-          "https://apis.google.com/js/api.js";
-        script.type = "text/javascript";
-        script.addEventListener("load", () => {
-          if (
-            typeof jQuery.ui === "undefined" ||
-            typeof jQuery.ui.autocomplete === "undefined"
-          ) {
-            loadjQueryUI(shipQuote);
-          } else {
-            shipQuote();
-          }
-        });
-        document.head.appendChild(script);
-      }
       
       let shopData = $("#postalcode").data();
       let address,
@@ -400,6 +382,7 @@ function loadjQueryUI(callback) {
   
       $(".shipping_rates button").bind("click", async function (event) {
         event.preventDefault();
+        console.log('click', event);
         $(
           "#rates_error, #rates_results, .rates_noresult, .rates_error, .rates_select, .result_box, .rates_cart_error, .result_note"
         ).hide();
