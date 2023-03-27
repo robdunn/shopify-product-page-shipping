@@ -89,8 +89,14 @@ function loadjQueryUI(callback) {
       ).done(function (ipdata) {
         cords = ipdata.location.lat + "," + ipdata.location.lng;
         location = ipdata.location;
-        let geo_url = `https://maps.googleapis.com/maps/api/geocode/json?key=${google_key}&latlng=${cords}&sensor=false`;
-        $.post( geo_url, "json" ).done(function ( geodata ) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder
+        .geocode({ location: {
+          lat: ipdata.location.lat,
+          lng: ipdata.location.lng,
+          } 
+        })
+        .then((geodata) => {
           address = {
             city: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "locality").long_name,
             region: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "administrative_area_level_1").short_name,
@@ -98,7 +104,6 @@ function loadjQueryUI(callback) {
             country: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "country").short_name,
           };
         });
-        cords = ipdata.location.lat + "," + ipdata.location.lng;
       });
   
       $.ajax(window.Shopify.routes.root + "cart.js", { dataType: "json" }).done(
@@ -382,7 +387,6 @@ function loadjQueryUI(callback) {
   
       $(".shipping_rates button").bind("click", async function (event) {
         event.preventDefault();
-        console.log('click', event);
         $(
           "#rates_error, #rates_results, .rates_noresult, .rates_error, .rates_select, .result_box, .rates_cart_error, .result_note"
         ).hide();
