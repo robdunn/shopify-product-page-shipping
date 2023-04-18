@@ -294,7 +294,7 @@ async function shipQuote() {
                 fields: ['formatted_address','geometry','address_component'],
                 sessiontoken: sessiontoken
               };
-            var detailsRequest = await new Promise((res, rej) => {
+            let detailsRequest = await new Promise((res, rej) => {
               placesService.getDetails(detailsParams, function(results, status) {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
                   res(results)
@@ -304,6 +304,23 @@ async function shipQuote() {
               //place call, reset session
               sessiontoken = crypto.randomUUID();
               let placeAddress = getAddress(detailsRequest);
+              if(placeAddress.code === '0000') {
+                const geocoder = new google.maps.Geocoder();
+                let geoRequest = await new Promise((res, rej) => {
+                  geocoder.geocode({ location: {
+                    lat: detailsRequest.geometry.location.lat(),
+                    lng: detailsRequest.geometry.location.lng(),
+                    } 
+                  })
+                  .then((geodata) => {
+                    res(geodata);
+                  });
+                });
+                let codeaddress = geoRequest.results.find(result => 
+                  result.address_components.find(address_component => address_component.types.indexOf('postal_code') > -1)
+                );
+                placeAddress = getAddress(codeaddress);
+              }
               $("#postalcode")
                 .val(detailsRequest.formatted_address)
                 .data({
@@ -750,21 +767,19 @@ async function shipQuote() {
     }, 500);
   };
 
-  const _onError = function (XMLHttpRequest, textStatus) {
-    console.log(
-      "onError",
-      XMLHttpRequest.responseJSON,
-      textStatus,
-      cart_restore
-    );
+  const _onError = function (XMLHttpRequest, textStatus, errorThrown) {
     $("#rates_loading").hide();
-    if (XMLHttpRequest.responseJSON.description)
+    if (XMLHttpRequest.responseJSON.description && cart_restore === false){
       $(".rates_cart_error")
         .html(XMLHttpRequest.responseJSON.description)
         .show();
-    if (XMLHttpRequest.responseJSON.error.length)
+    } else if (XMLHttpRequest.responseJSON.error && XMLHttpRequest.responseJSON.error.length && cart_restore === false) {
       $(".rates_cart_error")
         .html(XMLHttpRequest.responseJSON.error[0])
+        .show();
+    } else if (XMLHttpRequest.responseJSON.country && cart_restore === false)
+      $(".rates_cart_error")
+        .html(XMLHttpRequest.responseJSON.country[0])
         .show();
     if (cart_restore === false) restoreCart();
   };
