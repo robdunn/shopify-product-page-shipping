@@ -80,23 +80,28 @@ async function shipQuote() {
   await $.post(
     "https://www.googleapis.com/geolocation/v1/geolocate?key=" + google_key,
     "json"
-  ).done(function (ipdata) {
+  ).done(async function (ipdata) {
     cords = ipdata.location.lat + "," + ipdata.location.lng;
     location = ipdata.location;
-    const geocoder = new google.maps.Geocoder();
+  });
+  const geocoder = new google.maps.Geocoder();
+  await new Promise((res, rej) => {
     geocoder
     .geocode({ location: {
-      lat: ipdata.location.lat,
-      lng: ipdata.location.lng,
+      lat: location.lat,
+      lng: location.lng,
       } 
     })
     .then((geodata) => {
       address = {
-        city: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "locality").long_name,
+        city: (geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "locality")) ?
+          geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "locality").long_name:
+          geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "administrative_area_level_1").long_name,
         region: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "administrative_area_level_1").short_name,
         postal: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "postal_code").long_name,
         country: geodata.results[0].address_components.find( (address_component) => address_component.types[0] === "country").short_name,
       };
+      res();
     });
   });
 
