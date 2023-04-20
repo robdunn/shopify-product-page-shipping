@@ -13,35 +13,35 @@ async function loadJQuery() {
 }
 
 async function loadjQueryUI() {
-return new Promise(function (resolve, reject) {
-  const ui_style = document.createElement("link");
-  ui_style.href =
-    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css";
-  ui_style.rel = "stylesheet";
-  document.head.appendChild(ui_style);
-  const ui_script = document.createElement("script");
-  ui_script.src =
-    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js";
-  ui_script.type = "text/javascript";
-  ui_script.addEventListener("load", async () => {
-    resolve();
+  return new Promise(function (resolve, reject) {
+    const ui_style = document.createElement("link");
+    ui_style.href =
+      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css";
+    ui_style.rel = "stylesheet";
+    document.head.appendChild(ui_style);
+    const ui_script = document.createElement("script");
+    ui_script.src =
+      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js";
+    ui_script.type = "text/javascript";
+    ui_script.addEventListener("load", async () => {
+      resolve();
+    });
+    document.head.appendChild(ui_script);
   });
-  document.head.appendChild(ui_script);
-});
 }
 
 async function loadGAPI() {
-return new Promise(function (resolve, reject) {
-  const ui_script = document.createElement("script");
-  let API_KEY = document.getElementById('postalcode').dataset.key;
-  ui_script.src =
-    `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places`;
-  ui_script.type = "text/javascript";
-  ui_script.addEventListener("load", async () => {
-    resolve();
+  return new Promise(function (resolve, reject) {
+    const ui_script = document.createElement("script");
+    let API_KEY = document.getElementById('postalcode').dataset.key;
+    ui_script.src =
+      `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=initMap`;
+    ui_script.type = "text/javascript";
+    window.initMap = function() {
+      resolve();
+    };
+    document.head.appendChild(ui_script);
   });
-  document.head.appendChild(ui_script);
-});
 }
 
 (async function () {
@@ -80,7 +80,7 @@ async function shipQuote() {
   await $.post(
     "https://www.googleapis.com/geolocation/v1/geolocate?key=" + google_key,
     "json"
-  ).done(async function (ipdata) {
+  ).done(function (ipdata) {
     cords = ipdata.location.lat + "," + ipdata.location.lng;
     location = ipdata.location;
   });
